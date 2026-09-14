@@ -1,0 +1,23 @@
+# 改行コードの正典: リポジトリ内は LF、Windows 専用スクリプトだけ CRLF。
+# gofmt は LF 前提で、CRLF 混在は diff ノイズと lint 差異の原因になる。
+# エディタ側の設定は .editorconfig で同じ内容にしてある。
+* text=auto eol=lf
+
+# Windows 専用スクリプトはチェックアウト時に CRLF
+*.ps1  text eol=crlf
+*.psm1 text eol=crlf
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+
+# バイナリ
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.xlsx binary
+*.docx binary
+*.pptx binary
+*.exe  binary

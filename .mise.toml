@@ -1,0 +1,100 @@
+# =============================================================================
+# mise — ツールチェーンのバージョン固定とタスク定義
+# https://mise.jdx.dev/
+#
+# 初回セットアップ:
+#   mise trust && mise install
+#   mise run setup
+#
+# このファイル 1 つで、メンバーの Windows 端末でも CI (jdx/mise-action) でも同じ環境が
+# 再現される。バージョンは「動作確認した値」に固定し、上げるときは CI の緑を確認する。
+# =============================================================================
+
+[tools]
+# ── ランタイム ──────────────────────────────────────────────
+go   = "1.26"        # go.mod の go ディレクティブと一致させる
+node = "24"          # markdownlint-cli2 の実行基盤 (Active LTS)
+
+# ── 開発ツール ─────────────────────────────────────────────
+gh                      = "2.89.0"   # GitHub CLI
+golangci-lint           = "2.11.4"   # 設定は .golangci.yml (v2 形式)
+"npm:markdownlint-cli2" = "0.17.2"   # 設定は .markdownlint-cli2.yaml
+
+# ── 任意: Python スクリプトを併用する場合に有効化 ──────────
+# python = "3.12"
+# uv     = "0.11.3"
+# ── 任意: Web フロントエンドを併用する場合に有効化 ──────────
+# pnpm   = "10"
+
+[settings]
+auto_install = true
+
+# ── 環境変数 (ローカル開発用。.env は Git 管理外、雛形は .env.sample) ──
+[env]
+_.file = [".env", ".env.local"]
+
+# ── タスク ──────────────────────────────────────────────────
+# cmd.exe (Windows) と sh (CI の Linux) の両方で動く書き方に限定する。
+# 複数コマンドは配列で列挙し、シェル固有の構文 ($(...) やパイプ、echo) は使わない。
+# 複雑な処理は Go で cmd/cli/ に作り、ここからは go run で呼ぶ。
+
+[tasks.setup]
+description = "初期セットアップ (ツール導入 + Go モジュール取得)"
+run = [
+  "mise install",
+  "go mod download",
+]
+
+[tasks.build]
+description = "全 CLI を bin/ にビルド"
+run = "go build -o bin/ ./cmd/..."
+
+[tasks.test]
+description = "全テスト (race 検出 + カバレッジ)"
+run = "go test -v -race -cover ./..."
+
+[tasks."test:short"]
+description = "テスト (race 検出なし。cgo が使えない環境の代替)"
+run = "go test -v -cover ./..."
+
+[tasks.vet]
+description = "go vet"
+run = "go vet ./..."
+
+[tasks.lint]
+description = "静的解析 (Go + Markdown)"
+depends = ["lint:go", "lint:docs"]
+
+[tasks."lint:go"]
+description = "golangci-lint (CI 必須ゲート。設定は .golangci.yml)"
+run = "golangci-lint run ./..."
+
+[tasks."lint:docs"]
+description = "markdownlint-cli2 (CI 必須ゲート。設定は .markdownlint-cli2.yaml)"
+run = "markdownlint-cli2"
+
+[tasks.fmt]
+description = "整形 (gofmt + markdownlint --fix)"
+run = [
+  "gofmt -w .",
+  "markdownlint-cli2 --fix",
+]
+
+[tasks.check]
+description = "CI 相当 (vet + lint + test)"
+depends = ["vet", "lint", "test"]
+
+[tasks.info]
+description = "開発環境の情報表示"
+run = [
+  "mise current",
+  "go version",
+  "node --version",
+  "gh --version",
+  "golangci-lint --version",
+  "markdownlint-cli2 --version",
+]
+
+[tasks."scaffold:init"]
+description = "テンプレート由来の名前を新プロジェクト名に一括置換 (例: mise run scaffold:init -- -module github.com/org/repo -dry-run)"
+run = "go run ./cmd/cli/scaffold-init"

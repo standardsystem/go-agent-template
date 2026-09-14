@@ -1,0 +1,71 @@
+# ── ビルド成果物 (CI の tracked-ignored 検査で誤コミットを検知する) ──
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+*.test
+*.out
+coverage/
+
+# ── Go ──
+vendor/
+go.work
+go.work.sum
+
+# ── 環境変数・秘密情報 (雛形 .env.sample だけ追跡) ──
+.env
+.env.local
+.env.*.local
+
+# ── IDE (共有する設定だけ追跡) ──
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Git 管理外の 3 ディレクトリ (命名規約: docs/development/UNTRACKED_DIR_NAMING.md) ──
+# ディレクトリ自体はクローン直後から存在させたいので .gitkeep だけ追跡する
+data/*
+!data/.gitkeep
+output/*
+!output/.gitkeep
+temp/*
+!temp/.gitkeep
+# 旧来の tmp/ は使わない (AGENTS.md)。誤作成時にコミットされないよう ignore だけ残す
+tmp/
+
+# ── ログ (デバッグ出力の拡張子は .log: AGENTS.md) ──
+*.log
+logs/
+
+# ── Python (任意で併用する場合) ──
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# ── Node (任意で併用する場合) ──
+node_modules/
+
+# ── AI エージェントのローカル設定 (共有設定は追跡、個人設定と MCP 認証情報は除外) ──
+.claude/settings.local.json
+.claude/*.local.*
+.mcp.json
+mcp_settings.json
+mcp-config.json
+.cursor/
+.kiro/
+.gemini/
+.codex/

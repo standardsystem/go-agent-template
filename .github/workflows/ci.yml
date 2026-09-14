@@ -1,0 +1,70 @@
+# toolchain (.mise.toml) の再現性 + ビルド / vet / lint / テストの緑を担保する CI。
+#
+# REQUIRED (失敗で PR ブロック):
+#   - mise run setup       : toolchain (Go / Node / golangci-lint / markdownlint-cli2) 再現性
+#   - go build / go vet    : ビルド・標準静的解析
+#   - mise run lint:go     : golangci-lint (.golangci.yml)
+#   - tracked-ignored 検査 : .gitignore 該当の追跡ファイル (exe・成果物の誤コミット) 検知
+#   - mise run lint:docs   : markdownlint-cli2 (.markdownlint-cli2.yaml)
+#   - mise run test        : go test -race -cover
+#
+# テンプレート自身にもこの CI が回る。壊れたテンプレートを配布しないための自衛。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Build / Test / Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup mise (Go / Node / gh / golangci-lint / markdownlint-cli2)
+        uses: jdx/mise-action@v4
+        with:
+          experimental: true
+          cache: true
+
+      # ── REQUIRED: ツールチェーン再現性 ─────────────────────
+      - name: mise run setup (REQUIRED)
+        run: mise run setup
+
+      # ── REQUIRED: Go ビルド・静的解析・lint ────────────────
+      - name: Go build (REQUIRED)
+        run: go build ./...
+
+      - name: Go vet (REQUIRED)
+        run: go vet ./...
+
+      - name: golangci-lint (REQUIRED)
+        run: mise run lint:go
+
+      # ── REQUIRED: .gitignore 該当の追跡ファイル検知 ─────────
+      - name: tracked-ignored files check (REQUIRED)
+        run: |
+          viol=$(git ls-files --cached --ignored --exclude-standard)
+          if [ -n "$viol" ]; then
+            echo "::error::.gitignore に該当する追跡ファイルが存在します (exe・成果物等の誤コミット防止):"
+            echo "$viol"
+            exit 1
+          fi
+
+      # ── REQUIRED: Markdown lint ────────────────────────────
+      - name: markdownlint (REQUIRED)
+        run: mise run lint:docs
+
+      # ── REQUIRED: テスト ───────────────────────────────────
+      - name: mise run test (REQUIRED)
+        run: mise run test

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go run ./cmd/*)",
+      "Bash(gofmt *)",
+      "Bash(golangci-lint *)",
+      "Bash(markdownlint-cli2 *)",
+      "Bash(mise run *)",
+      "Bash(mise current*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch --show-current)",
+      "PowerShell(go build *)",
+      "PowerShell(go test *)",
+      "PowerShell(go vet *)",
+      "PowerShell(mise run *)",
+      "PowerShell(git status*)",
+      "PowerShell(git diff*)",
+      "PowerShell(git log*)"
+    ]
+  }
+}

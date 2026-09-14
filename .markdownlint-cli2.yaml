@@ -1,0 +1,17 @@
+# markdownlint-cli2 の設定 (バージョンは .mise.toml で固定)。
+# CI (mise run lint:docs) と VS Code の markdownlint 拡張が同じファイルを読む。
+config:
+  default: true
+  MD013: false # line-length。日本語は 1 行が長くなりがちなので無効 (目安 80〜100 字は AGENTS.md)
+  MD024: false # no-duplicate-heading。章ごとの同名見出し (例: 「手順」) を許可
+  MD033: false # no-inline-html。<br> 等の直書きを許可
+  MD041: false # first-line-heading。フロントマター付き文書を許可
+globs:
+  - "**/*.md"
+ignores:
+  - "node_modules/**"
+  - "temp/**"
+  - "output/**"
+  - "data/**"
+  - "bin/**"
+  - ".venv/**"

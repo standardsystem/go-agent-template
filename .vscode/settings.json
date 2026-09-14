@@ -1,0 +1,13 @@
+{
+  "files.eol": "\n",
+  "files.encoding": "utf8",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.formatOnSave": true,
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  },
+  "go.lintTool": "golangci-lint-v2",
+  "go.lintFlags": ["--fast-only"],
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
+}

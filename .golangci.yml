@@ -1,0 +1,30 @@
+# golangci-lint v2 設定 (バージョンは .mise.toml で固定)
+#
+# 方針: 新規プロジェクトは初日から「全件クリーン」を CI ゲートにする。
+# 既存負債を抱えて始めるときは、まず高シグナル linter だけ有効にして緑にし、
+# その後に段階的 (ratchet) に追加する。
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - errcheck     # 未処理エラー (Close/Flush 等の慣用的な無視は下の preset で緩和)
+    - govet        # go vet 相当
+    - ineffassign  # 無効な代入
+    - staticcheck  # 静的解析 (v2 では gosimple / stylecheck を統合)
+    - unused       # 未使用シンボル
+  exclusions:
+    generated: lax
+    presets:
+      - std-error-handling
+
+formatters:
+  enable:
+    - gofmt
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

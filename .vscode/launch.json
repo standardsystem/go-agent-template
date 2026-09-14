@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Current File",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${fileDirname}",
+      "args": [],
+      "showLog": true
+    },
+    {
+      "name": "Debug: scaffold-init (dry-run)",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/cli/scaffold-init/main.go",
+      "cwd": "${workspaceFolder}",
+      "args": ["-module", "github.com/example/new-project", "-dry-run"],
+      "showLog": true
+    }
+  ]
+}

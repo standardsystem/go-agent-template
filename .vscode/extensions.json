@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "golang.Go",
+    "DavidAnson.vscode-markdownlint",
+    "EditorConfig.EditorConfig",
+    "bierner.markdown-mermaid"
+  ]
+}
