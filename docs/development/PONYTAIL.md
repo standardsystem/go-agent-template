@@ -96,6 +96,41 @@ Codex で同じコマンドが要る場合は各自で `codex plugin marketplace
 と `codex plugin add ponytail@ponytail` を実行する（ユーザー単位の設定で、リポジトリには
 入れない）。
 
+### ワークスペース信頼（各メンバー 1 回。プラグインの導入記録とは別）
+
+[.claude/settings.json](../../.claude/settings.json) の `permissions.allow` と
+`extraKnownMarketplaces` は、そのフォルダを Claude Code で「信頼」するまで適用されない
+（`deny` / `ask` は即時に効く）。信頼の記録は `~/.claude.json` の
+`projects["<リポジトリのルート>"].hasTrustDialogAccepted` で、キーは作業ディレクトリの
+文字列と厳密比較される。ここでも上記のドライブ文字の大小が効く: VS Code 拡張は
+`c:/Projects/...`（小文字）のキーを探すが、PowerShell から起動した CLI で承認すると
+`C:/Projects/...`（大文字）に記録されて一致しない。さらに VS Code 拡張のセッションは
+信頼ダイアログ自体を出さない（対話型 CLI だけが表示する）。未信頼のままだと許可済みの
+はずのコマンドで確認が出続け、デバッグログ（`~/.claude/debug/`）に
+`Dropped N project-scoped permissions.allow entries — workspace not yet trusted` が残る
+（2026-09-15 に再現確認）。
+
+承認は、小文字パスに `cd` した cmd から対話型 CLI を起動して行う（PowerShell はドライブ
+文字を大文字に正規化するが、cmd の `cd /d` は入力どおりの文字列を子プロセスへ渡す）:
+
+```powershell
+$claude = "$env:USERPROFILE\.vscode\extensions\anthropic.claude-code-2.1.270-win32-x64\resources\native-binary\claude.exe"
+cmd /c "cd /d c:\Projects\STANDARDSYSTEM\go-agent-template && $claude"
+```
+
+起動直後の「Do you trust the files in this folder?」で許可ルールの一覧を確認して
+「Yes, proceed」を選び、`/exit` で終了する。次のコマンドで小文字キーが `True` になって
+いれば完了:
+
+```powershell
+$j = Get-Content "$env:USERPROFILE\.claude.json" -Raw | ConvertFrom-Json -AsHashtable
+$j.projects.Keys | Where-Object { $_ -like '*go-agent-template*' } |
+  ForEach-Object { "$_ => $($j.projects[$_].hasTrustDialogAccepted)" }
+```
+
+「Developer: Reload Window」後の新規会話から有効になる。公式ドキュメントは、この値を
+手で `true` にする方法も認めている（Claude Code を全て閉じ、バックアップを取ってから）。
+
 ## 使い方
 
 - 通常の実装依頼では何もしなくてよい。層 1 が常に効く
