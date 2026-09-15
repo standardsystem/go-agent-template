@@ -18,8 +18,9 @@ CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理�
 | 改行・文字コード | [.gitattributes](.gitattributes) / [.editorconfig](.editorconfig) | LF 基本、Windows スクリプトのみ CRLF |
 | CI | [.github/workflows/ci.yml](.github/workflows/ci.yml) | mise で環境再現 → build / vet / lint / test / 誤コミット検査 |
 | エージェント規約 | [AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md) / [CODEX.md](CODEX.md) / [.agent/rules.md](.agent/rules.md) | 共通正典と各エージェントの入口、合意ゲート、行動規範 |
+| 実装の最小化 | [AGENTS.md](AGENTS.md)「実装の最小化規範（Ponytail）」/ [docs/development/PONYTAIL.md](docs/development/PONYTAIL.md) | Ponytail（YAGNI・既存コード・標準ライブラリ優先の梯子）の常時ルールと、規約との優先順位・更新手順 |
 | 手順書 | [.agent/skills/](.agent/skills/) / [.agents/skills/](.agents/skills/) | 手順本体と Codex 用入口（コミット、CLI 追加、コマンド失敗診断） |
-| Claude Code 設定 | [.claude/settings.json](.claude/settings.json) / `.claude/agents/` | 共有の許可設定とサブエージェント定義の置き場 |
+| Claude Code 設定 | [.claude/settings.json](.claude/settings.json) / `.claude/agents/` | 共有の許可設定・Ponytail プラグインの共有有効化とサブエージェント定義の置き場 |
 | 開発規約 | [docs/development/](docs/development/) | コミット規約、テスト設計指針、Git 管理外ディレクトリ命名、内部ライブラリ索引 |
 | ナレッジ置き場 | [docs/knowledge/](docs/knowledge/index.md) | 索引 → 本体の階層でドメイン知識を蓄積 |
 | 最小 CLI と実例テスト | [cmd/cli/scaffold-init](cmd/cli/scaffold-init/main.go) / [internal/scaffold](internal/scaffold/rename.go) | テンプレート名の一括置換ツール。規約どおりの CLI と AAA テストの実例 |

@@ -30,6 +30,7 @@
 | [.agent/skills/](.agent/skills/) | 共通手順の正本。Codex 用入口との対応は下表を参照する |
 | `.claude/agents/` | エージェント定義を手順書として読む。読むだけでサブエージェントは起動しない |
 | [.claude/settings.json](.claude/settings.json)・`settings.local.json` | Claude 専用の権限・環境設定。Codex の権限や実行許可として引き継がない |
+| [.claude/settings.json](.claude/settings.json) の `enabledPlugins`（Ponytail） | Codex には引き継がれない。同じ常時ルールは [AGENTS.md](AGENTS.md)「実装の最小化規範」で効く。`/ponytail-review` 等が要るなら各自で `codex plugin marketplace add DietrichGebert/ponytail` → `codex plugin add ponytail@ponytail` を行う（[導入記録](docs/development/PONYTAIL.md)） |
 | Claude のローカルメモリ | 共有知識は [ドメインナレッジ索引](docs/knowledge/index.md) と現行チケットから確認する |
 
 Claude 専用の `Plan` モードや `Read`・`Grep`・`Glob`・`Bash` は、同名の Codex ツールが

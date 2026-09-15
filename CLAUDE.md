@@ -22,7 +22,9 @@ Claude Code だけに関係する対応付けを書く（共通ルールを二�
 ## 設定ファイルの分担
 
 - [.claude/settings.json](.claude/settings.json) はチーム共有の設定（追跡する）。
-  検証系コマンド（`go build` / `go test` / `mise run` 等）の許可だけを置く
+  検証系コマンド（`go build` / `go test` / `mise run` 等）の許可と、チーム共有で有効化する
+  プラグイン（Ponytail の `extraKnownMarketplaces` / `enabledPlugins`。経緯は
+  [docs/development/PONYTAIL.md](docs/development/PONYTAIL.md)）を置く
 - `.claude/settings.local.json` は個人の設定（Git 管理外）。個人パス・コネクタの許可・
   autoMode の追加許可はこちらに書く
 - MCP サーバの設定（`.mcp.json`）は認証情報を含みうるため Git 管理外
@@ -35,6 +37,18 @@ Claude Code だけに関係する対応付けを書く（共通ルールを二�
 - Claude Code はユーザーの依頼なしにサブエージェントを起動しないため、
   **該当タスクを受けたらまず起動を提案し、承認を得てから起動する**
 - 起動しない場合でも、定義ファイルに書かれたチェックリストは本体の作業に適用する
+
+## Ponytail（実装の最小化）
+
+常時ルールは [AGENTS.md](AGENTS.md)「実装の最小化規範（Ponytail）」で効く。加えて
+[.claude/settings.json](.claude/settings.json) の `enabledPlugins` でプラグインを宣言して
+いるが、GitHub 配布のプラグインはプロジェクト設定だけでは導入されない（起動時に
+「enabled in project settings but isn't installed」と出る）。各メンバーが一度
+[docs/development/PONYTAIL.md](docs/development/PONYTAIL.md) の手順で CLI から導入すると、
+`/ponytail-review`（差分の過剰設計レビュー。正しさ・セキュリティは対象外なので
+`/code-review` と併用）、`/ponytail-audit`、`/ponytail-debt`、
+`/ponytail lite|full|ultra|off` が使える。初回に出るステータスライン設定の提案は、承認を
+得てから `~/.claude/settings.json` に書く。
 
 ## 実装着手前の合意（Plan モード）
 
