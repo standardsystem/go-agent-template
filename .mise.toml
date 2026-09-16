@@ -12,17 +12,16 @@
 
 [tools]
 # ── ランタイム ──────────────────────────────────────────────
-go   = "1.26"        # go.mod の go ディレクティブと一致させる
-node = "24"          # markdownlint-cli2 の実行基盤 (Active LTS)
+go     = "1.26"      # go.mod の go ディレクティブと一致させる
+node   = "24"        # markdownlint-cli2 の実行基盤 (Active LTS)
+python = "3.13"      # 補助スクリプト用。仮想環境と依存は uv が管理する
 
 # ── 開発ツール ─────────────────────────────────────────────
 gh                      = "2.89.0"   # GitHub CLI
+uv                      = "0.12.13"  # Python の依存解決・実行 (pip / venv は直接使わない)
 golangci-lint           = "2.11.4"   # 設定は .golangci.yml (v2 形式)
 "npm:markdownlint-cli2" = "0.17.2"   # 設定は .markdownlint-cli2.yaml
 
-# ── 任意: Python スクリプトを併用する場合に有効化 ──────────
-# python = "3.12"
-# uv     = "0.11.3"
 # ── 任意: Web フロントエンドを併用する場合に有効化 ──────────
 # pnpm   = "10"
 
@@ -32,11 +31,14 @@ auto_install = true
 # ── 環境変数 (ローカル開発用。.env は Git 管理外、雛形は .env.sample) ──
 [env]
 _.file = [".env", ".env.local"]
+# uv run が uv 管理の Python (より新しい版) を選ばないよう、PATH 上の mise の Python だけを使わせる
+UV_PYTHON_PREFERENCE = "only-system"
 
 # ── タスク ──────────────────────────────────────────────────
 # cmd.exe (Windows) と sh (CI の Linux) の両方で動く書き方に限定する。
 # 複数コマンドは配列で列挙し、シェル固有の構文 ($(...) やパイプ、echo) は使わない。
-# 複雑な処理は Go で cmd/cli/ に作り、ここからは go run で呼ぶ。
+# 複雑な処理は Go で cmd/cli/ に作って go run で呼ぶか、Python なら scripts/ に置いて
+# uv run で呼ぶ (依存はスクリプト先頭の PEP 723 メタデータに書く)。
 
 [tasks.setup]
 description = "初期セットアップ (ツール導入 + Go モジュール取得)"
@@ -90,6 +92,8 @@ run = [
   "mise current",
   "go version",
   "node --version",
+  "python --version",
+  "uv --version",
   "gh --version",
   "golangci-lint --version",
   "markdownlint-cli2 --version",

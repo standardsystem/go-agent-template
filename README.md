@@ -105,6 +105,7 @@ mise run check     # vet + lint + test
 
 ```text
 cmd/cli/<tool>/        Go CLI (1 ツール 1 ディレクトリ。main.go)
+scripts/               Python 補助スクリプト (uv run で実行。依存は PEP 723)
 internal/<pkg>/        内部ライブラリ (索引: docs/development/INTERNAL_LIBS.md)
 docs/development/      開発規約
 docs/manuals/          手順書 (CLI 一覧、PowerShell 7 導入)

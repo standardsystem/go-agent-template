@@ -43,8 +43,8 @@ Claude 専用の `Plan` モードや `Read`・`Grep`・`Glob`・`Bash` は、同
   `docs/`・`scripts/` などのコマンド用パスはリポジトリルートを基準にする。リンクが
   切れている場合は `rg --files --hidden` で実在する移動先を確認する。
 - **シェルと実行**: PowerShell 7 と `mise` を使う。Bash 用の環境変数指定・`/dev/null`・
-  チェーンをそのまま実行せず、失敗ログも残す。新規ツールは Go で作る。WSL の存在を
-  前提にしない。
+  チェーンをそのまま実行せず、失敗ログも残す。新規ツールは原則 Go で作る（Python を
+  選ぶ条件は [AGENTS.md](AGENTS.md) BASE RULES）。WSL の存在を前提にしない。
 - **一時ファイル**: OS の一時ディレクトリや `C:\tmp` を使う例は、
   [命名規約](docs/development/UNTRACKED_DIR_NAMING.md) に従った `temp/` に読み替える。
   受領 ZIP の展開物は `data/_extracted/`、成果物は `temp/` または `output/`。
