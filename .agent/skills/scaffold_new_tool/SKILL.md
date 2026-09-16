@@ -5,7 +5,8 @@ description: cmd/cli/ に Go CLI ツールを 1 本追加する。雛形コー�
 
 # Go CLI ツールの追加
 
-新規ツールは Go で作る（[AGENTS.md](../../../AGENTS.md) BASE RULES）。
+繰り返し使う CLI・解析ツールは Go で作る（Python を選ぶ条件は
+[AGENTS.md](../../../AGENTS.md) BASE RULES）。
 1 ツール 1 ディレクトリ、`main` は薄く、ロジックは `internal/` に置いてテストする。
 実例は [cmd/cli/scaffold-init](../../../cmd/cli/scaffold-init/main.go) と
 [internal/scaffold](../../../internal/scaffold/rename.go)。

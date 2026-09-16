@@ -30,9 +30,16 @@ Codex が発見する入口は [.agents/skills/](.agents/skills/) に置き、�
 - 文字コードは UTF-8（BOM なし）、改行は LF を基本とする（正典は
   [.gitattributes](.gitattributes)。Windows 専用スクリプト `.ps1` `.cmd` `.bat` だけ CRLF）
 - デバッグ用のテキストを作成する際には拡張子を `.log` とすること（`.gitignore` 対象）
-- エージェントがスクリプトやツールを作成する必要がある場合は、JavaScript や Python では
-  なく **Go** を使用すること（`cmd/cli/<ツール名>/` に置く。手順は
-  [scaffold_new_tool](.agent/skills/scaffold_new_tool/SKILL.md)）
+- エージェントがスクリプトやツールを作成する場合は **Go か Python** を使うこと
+  （JavaScript は使わない）。既定は Go で、Python は下記の条件で選ぶ
+  - **Go**: 繰り返し使う CLI・解析ツール。`cmd/cli/<ツール名>/` に置く（手順は
+    [scaffold_new_tool](.agent/skills/scaffold_new_tool/SKILL.md)）
+  - **Python**: Go に実用的なライブラリが無い領域（Office 文書の生成・編集、データ分析
+    など）と、使い捨ての補助スクリプト。`scripts/<名前>.py` に置き、**実行は `uv run`**。
+    依存はスクリプト先頭の PEP 723 インラインメタデータに書き、`pip install` や手動の
+    `venv` は使わない（環境がスクリプト単位で再現できるため）
+  - Python 本体と `uv` のバージョンは [.mise.toml](.mise.toml) で固定する。
+    `mise run info` で両方のバージョンを確認できる
 - テンポラリのファイル出力が必要な場合は **`./temp` フォルダだけ**を使用すること。
   一時ディレクトリはここ 1 つで、`./tmp` や OS の一時ディレクトリは使わない
   - チケット対応・調査の作業ファイル、添付ダウンロードは

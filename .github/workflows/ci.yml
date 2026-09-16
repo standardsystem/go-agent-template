@@ -1,7 +1,7 @@
 # toolchain (.mise.toml) の再現性 + ビルド / vet / lint / テストの緑を担保する CI。
 #
 # REQUIRED (失敗で PR ブロック):
-#   - mise run setup       : toolchain (Go / Node / golangci-lint / markdownlint-cli2) 再現性
+#   - mise run setup       : toolchain (Go / Node / Python / uv / golangci-lint / markdownlint-cli2) 再現性
 #   - go build / go vet    : ビルド・標準静的解析
 #   - mise run lint:go     : golangci-lint (.golangci.yml)
 #   - tracked-ignored 検査 : .gitignore 該当の追跡ファイル (exe・成果物の誤コミット) 検知
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup mise (Go / Node / gh / golangci-lint / markdownlint-cli2)
+      - name: Setup mise (Go / Node / Python / uv / gh / golangci-lint / markdownlint-cli2)
         uses: jdx/mise-action@v4
         with:
           experimental: true
