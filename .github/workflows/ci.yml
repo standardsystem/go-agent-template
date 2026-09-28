@@ -5,6 +5,7 @@
 #   - go build / go vet    : ビルド・標準静的解析
 #   - mise run lint:go     : golangci-lint (.golangci.yml)
 #   - tracked-ignored 検査 : .gitignore 該当の追跡ファイル (exe・成果物の誤コミット) 検知
+#   - 改行コード検査       : CRLF を含む追跡ファイルの検知 (改行は LF。.gitattributes)
 #   - mise run lint:docs   : markdownlint-cli2 (.markdownlint-cli2.yaml)
 #   - mise run test        : go test -race -cover
 #
@@ -57,6 +58,18 @@ jobs:
           viol=$(git ls-files --cached --ignored --exclude-standard)
           if [ -n "$viol" ]; then
             echo "::error::.gitignore に該当する追跡ファイルが存在します (exe・成果物等の誤コミット防止):"
+            echo "$viol"
+            exit 1
+          fi
+
+      # ── REQUIRED: 改行コード (LF) ──────────────────────────
+      # ローカルのコミットは .gitattributes が LF に正規化する。ここでは Web 画面からの
+      # アップロードや属性の書き換えなど、正規化を通らずに入った CRLF を止める。
+      - name: line ending check (REQUIRED)
+        run: |
+          viol=$(git ls-files --eol | awk '$1 == "i/crlf" || $1 == "i/mixed"')
+          if [ -n "$viol" ]; then
+            echo "::error::CRLF を含む追跡ファイルが存在します (改行は LF。例外は .gitattributes 参照):"
             echo "$viol"
             exit 1
           fi

@@ -1,5 +1,5 @@
 # EditorConfig: https://editorconfig.org
-# 改行・文字コードの正典は .gitattributes と揃える (LF 基本、Windows スクリプトのみ CRLF)。
+# 改行・文字コードの正典は .gitattributes と揃える (すべて LF。cmd.exe の都合で .cmd/.bat のみ CRLF)。
 root = true
 
 [*]
@@ -14,7 +14,7 @@ indent_size = 2
 indent_style = tab
 indent_size = 4
 
-[*.{ps1,psm1,cmd,bat}]
+[*.{cmd,bat}]
 end_of_line = crlf
 
 [Makefile]

@@ -22,8 +22,13 @@ Codex の読み込み上限（既定 32 KiB）に収まる分量を保つこと�
 - ツールのバージョン固定・タスク実行・環境構築には `mise` を利用すること
   （[.mise.toml](.mise.toml)）。複数の操作はできるだけ `mise` のタスクにまとめ、
   OS 固有のシェルハック（`[Console]::OutputEncoding` の都度変更など）に依存しないこと
-- 文字コードは UTF-8（BOM なし）、改行は LF を基本とする（正典は
-  [.gitattributes](.gitattributes)。Windows 専用スクリプト `.ps1` `.cmd` `.bat` だけ CRLF）
+- 文字コードは UTF-8（BOM なし）、改行は **LF に統一**する（正典は
+  [.gitattributes](.gitattributes)。例外は、cmd.exe が LF だけの改行で `call` / `goto` の
+  ラベルを見失う `.cmd` `.bat` だけ）。CRLF を含む追跡ファイルは CI で落ちる
+  - スクリプトが書き出すテキストも LF にする。Windows では Python の既定の書き出しと
+    PowerShell の `Set-Content` / `Out-File` が CRLF を書くので、Python は
+    `newline="\n"` を指定し、PowerShell は LF で連結した文字列を `-NoNewline` 付きで
+    書く（Go の標準ライブラリは指定どおり LF で書く）
 - デバッグ用のテキストを作成する際には拡張子を `.log` とすること（`.gitignore` 対象）
 - エージェントがスクリプトやツールを作成する場合は **Go か Python** を使うこと
   （JavaScript は使わない）。既定は Go で、Python は下記の条件で選ぶ

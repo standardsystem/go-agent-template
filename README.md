@@ -15,7 +15,7 @@ CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理�
 | ツールチェーン | [.mise.toml](.mise.toml) | Go / Node / gh / golangci-lint / markdownlint-cli2 の固定とタスク |
 | Go lint | [.golangci.yml](.golangci.yml) | golangci-lint v2。高シグナル linter を全件クリーン運用 |
 | Markdown lint | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | エージェントが書く文書の品質ゲート |
-| 改行・文字コード | [.gitattributes](.gitattributes) / [.editorconfig](.editorconfig) | LF 基本、Windows スクリプトのみ CRLF |
+| 改行・文字コード | [.gitattributes](.gitattributes) / [.editorconfig](.editorconfig) | LF に統一（cmd.exe の都合で `.cmd` / `.bat` だけ CRLF）。CRLF の混入は CI で検査 |
 | CI | [.github/workflows/ci.yml](.github/workflows/ci.yml) | mise で環境再現 → build / vet / lint / test / 誤コミット検査 |
 | エージェント規約 | [AGENTS.md](AGENTS.md) | 唯一の指示書（Claude Code / Codex が直接読む）。合意ゲート、行動規範、エージェント別の補足 |
 | 実装の最小化 | [AGENTS.md](AGENTS.md)「実装の最小化規範（Ponytail）」/ [docs/development/PONYTAIL.md](docs/development/PONYTAIL.md) | Ponytail（YAGNI・既存コード・標準ライブラリ優先の梯子）の常時ルールと、規約との優先順位・更新手順 |
