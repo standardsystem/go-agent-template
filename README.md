@@ -68,8 +68,47 @@ mise run setup     # ツール導入 + go mod download
 mise run check     # vet + lint + test
 ```
 
-エージェントへの指示は [AGENTS.md](AGENTS.md) だけに書く。Claude Code は **2.1.277 以降が
-必須**で、それより前の版はサポートしない（`CLAUDE.md` が無いときに AGENTS.md を自動で読む
+**Claude Code と Codex のどちらでも、共通の規約・手順書・mise タスクで開発できる。**
+開発環境は Windows / [PowerShell 7](docs/manuals/POWERSHELL7_SETUP.md) を前提とし、
+エージェントへの指示は [AGENTS.md](AGENTS.md) に書く。エージェント本体の導入・認証は
+各自で行う（`mise run setup` が導入するのは開発ツール）。
+
+#### Codex（CLI / VS Code 拡張）
+
+[公式の CLI 導入手順](https://learn.chatgpt.com/docs/codex/cli)に沿って導入・サインインし、
+リポジトリのルートで PowerShell 7 から起動する。
+
+```powershell
+codex
+```
+
+[VS Code 拡張](https://learn.chatgpt.com/docs/codex/ide)の場合は、リポジトリのルートを
+フォルダとして開き、Codex でローカルの会話を開始する。
+
+- ルートの [AGENTS.md](AGENTS.md) が自動で読み込まれ、合意ゲート・日本語での報告・
+  テスト設計・Ponytail の常時ルールが適用される
+- [.agents/skills/](.agents/skills/) の3つの手順書をスキルとして自動で発見する。
+  会話中に `$scaffold-new-tool`、`$git-commit-push`、`$diagnose-command-failure` と
+  名前を指定して利用できる。各手順の用途は [AGENTS.md](AGENTS.md) のスキル一覧を参照する
+- ビルド・検証には Claude Code と同じ `mise run build` / `mise run check` を使う
+- 実行許可・MCP 接続・プラグインは Codex 側で設定する。`.claude/settings.json` の許可や
+  プラグイン設定は引き継がれず、`.claude/agents/` の定義は参照資料として扱う。
+  Ponytail の追加コマンドが必要なら [導入手順](docs/development/PONYTAIL.md)を参照する
+
+初回は、会話で次のように指示書とスキルの認識を確認できる。
+
+```text
+AGENTS.md の規約と利用可能なプロジェクトのスキルを確認し、開発の進め方を説明してください。
+```
+
+読み込み仕様は OpenAI 公式の
+[AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)・
+[スキル](https://learn.chatgpt.com/docs/build-skills)を参照する。
+
+#### Claude Code
+
+Claude Code は **2.1.277 以降が必須**で、それより前の版はサポートしない
+（`CLAUDE.md` が無いときに AGENTS.md を自動で読む
 機能を前提にしているため。`/config` の Project instructions は既定のまま）。Bedrock /
 Vertex / Foundry 経由では自動で読まれないので、個人の `CLAUDE.local.md`（Git 管理外）に
 `@AGENTS.md` の 1 行を書く。
