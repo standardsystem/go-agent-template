@@ -11,6 +11,5 @@
 | [manuals/POWERSHELL7_SETUP.md](manuals/POWERSHELL7_SETUP.md) | PowerShell 7 の導入と VS Code の既定シェル切り替え |
 | [knowledge/index.md](knowledge/index.md) | ドメインナレッジ索引（索引 → 本体の階層） |
 
-エージェント向けの規約は [../AGENTS.md](../AGENTS.md)（正典）、
-[../CLAUDE.md](../CLAUDE.md)、[../CODEX.md](../CODEX.md)、
-[../.agent/rules.md](../.agent/rules.md)。
+エージェント向けの規約は [../AGENTS.md](../AGENTS.md)（唯一の指示書）、手順書は
+[../.agents/skills/](../.agents/skills/)。

@@ -15,11 +15,11 @@ CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理�
 | ツールチェーン | [.mise.toml](.mise.toml) | Go / Node / gh / golangci-lint / markdownlint-cli2 の固定とタスク |
 | Go lint | [.golangci.yml](.golangci.yml) | golangci-lint v2。高シグナル linter を全件クリーン運用 |
 | Markdown lint | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | エージェントが書く文書の品質ゲート |
-| 改行・文字コード | [.gitattributes](.gitattributes) / [.editorconfig](.editorconfig) | LF 基本、Windows スクリプトのみ CRLF |
+| 改行・文字コード | [.gitattributes](.gitattributes) / [.editorconfig](.editorconfig) | LF に統一（cmd.exe の都合で `.cmd` / `.bat` だけ CRLF）。CRLF の混入は CI で検査 |
 | CI | [.github/workflows/ci.yml](.github/workflows/ci.yml) | mise で環境再現 → build / vet / lint / test / 誤コミット検査 |
-| エージェント規約 | [AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md) / [CODEX.md](CODEX.md) / [.agent/rules.md](.agent/rules.md) | 共通正典と各エージェントの入口、合意ゲート、行動規範 |
+| エージェント規約 | [AGENTS.md](AGENTS.md) | 唯一の指示書（Claude Code / Codex が直接読む）。合意ゲート、行動規範、エージェント別の補足 |
 | 実装の最小化 | [AGENTS.md](AGENTS.md)「実装の最小化規範（Ponytail）」/ [docs/development/PONYTAIL.md](docs/development/PONYTAIL.md) | Ponytail（YAGNI・既存コード・標準ライブラリ優先の梯子）の常時ルールと、規約との優先順位・更新手順 |
-| 手順書 | [.agent/skills/](.agent/skills/) / [.agents/skills/](.agents/skills/) | 手順本体と Codex 用入口（コミット、CLI 追加、コマンド失敗診断） |
+| 手順書 | [.agents/skills/](.agents/skills/) | コミット、CLI 追加、コマンド失敗診断（Codex は自動で発見、Claude Code は AGENTS.md の表から参照） |
 | Claude Code 設定 | [.claude/settings.json](.claude/settings.json) / `.claude/agents/` | 共有の許可設定・Ponytail プラグインの共有有効化とサブエージェント定義の置き場 |
 | 開発規約 | [docs/development/](docs/development/) | コミット規約、テスト設計指針、Git 管理外ディレクトリ命名、内部ライブラリ索引 |
 | ナレッジ置き場 | [docs/knowledge/](docs/knowledge/index.md) | 索引 → 本体の階層でドメイン知識を蓄積 |
@@ -68,6 +68,12 @@ mise run setup     # ツール導入 + go mod download
 mise run check     # vet + lint + test
 ```
 
+エージェントへの指示は [AGENTS.md](AGENTS.md) だけに書く。Claude Code は **2.1.277 以降が
+必須**で、それより前の版はサポートしない（`CLAUDE.md` が無いときに AGENTS.md を自動で読む
+機能を前提にしているため。`/config` の Project instructions は既定のまま）。Bedrock /
+Vertex / Foundry 経由では自動で読まれないので、個人の `CLAUDE.local.md`（Git 管理外）に
+`@AGENTS.md` の 1 行を書く。
+
 ### 4. プロジェクト固有の部分を埋める
 
 「【要記入】」を検索して埋める。主な箇所:
@@ -84,7 +90,7 @@ mise run check     # vet + lint + test
 
 コミット規約は [COMMIT_CONVENTION.md](docs/development/COMMIT_CONVENTION.md)。
 日本語メッセージは `-F` でファイルから渡す
-（[git_commit_push](.agent/skills/git_commit_push/SKILL.md)）。
+（[git-commit-push](.agents/skills/git-commit-push/SKILL.md)）。
 
 ## mise タスク
 
@@ -110,8 +116,7 @@ internal/<pkg>/        内部ライブラリ (索引: docs/development/INTERNAL_
 docs/development/      開発規約
 docs/manuals/          手順書 (CLI 一覧、PowerShell 7 導入)
 docs/knowledge/        ドメインナレッジ (索引 → 本体)
-.agent/                全エージェント共通の行動規範と手順書 (正本)
-.agents/skills/        Codex 用の入口 (本体へリンク)
+.agents/skills/        全エージェント共通の手順書 (一覧は AGENTS.md)
 .claude/               Claude Code 用 (settings.json は共有、settings.local.json は個人)
 .github/workflows/     CI
 data/ output/ temp/    Git 管理外。命名規約: docs/development/UNTRACKED_DIR_NAMING.md

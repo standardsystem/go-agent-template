@@ -4,7 +4,7 @@
     コマンド先頭バイト欠落問題の調査用に環境情報を収集するスクリプト
 .DESCRIPTION
     シェル環境、エンコーディング設定、コードページ、WSL状態などを収集して表示します。
-    問題発生時に diagnose_command_failure スキルから呼び出してください。
+    問題発生時に diagnose-command-failure スキルから呼び出してください。
 #>
 
 param(
