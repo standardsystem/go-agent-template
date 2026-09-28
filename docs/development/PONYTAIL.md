@@ -156,4 +156,4 @@ $j.projects.Keys | Where-Object { $_ -like '*go-agent-template*' } |
   個人で外すだけなら `.claude/settings.local.json` に
   `"enabledPlugins": {"ponytail@ponytail": false}` を書く
 - 層 1 も外す: AGENTS.md の該当節を削除し、本書と [README.md](../../README.md)・
-  [docs/README.md](../README.md) の行も消す
+  [docs/README.md](../README.md) の Ponytail への言及も消す

@@ -68,11 +68,59 @@ mise run setup     # ツール導入 + go mod download
 mise run check     # vet + lint + test
 ```
 
-エージェントへの指示は [AGENTS.md](AGENTS.md) だけに書く。Claude Code は **2.1.277 以降が
-必須**で、それより前の版はサポートしない（`CLAUDE.md` が無いときに AGENTS.md を自動で読む
-機能を前提にしているため。`/config` の Project instructions は既定のまま）。Bedrock /
-Vertex / Foundry 経由では自動で読まれないので、個人の `CLAUDE.local.md`（Git 管理外）に
-`@AGENTS.md` の 1 行を書く。
+**Claude Code と Codex のどちらでも、共通の規約・手順書・mise タスクで開発できる。**
+開発環境は Windows / [PowerShell 7](docs/manuals/POWERSHELL7_SETUP.md) を前提とし、
+エージェントへの指示は [AGENTS.md](AGENTS.md) だけに書く。エージェント本体の導入・認証は
+各自で行う（`mise run setup` が導入するのは開発ツール）。
+
+#### Codex（CLI / VS Code 拡張）
+
+[公式の CLI 導入手順](https://learn.chatgpt.com/docs/codex/cli)に沿って導入・サインインし、
+リポジトリのルートで PowerShell 7 から起動する。
+
+```powershell
+codex
+```
+
+[VS Code 拡張](https://learn.chatgpt.com/docs/codex/ide)の場合は、リポジトリのルートを
+フォルダとして開き、Codex でローカルの会話を開始する。
+
+- ルートの [AGENTS.md](AGENTS.md) が自動で読み込まれ、合意ゲート・日本語での報告・
+  テスト設計・Ponytail の常時ルールが適用される
+- [.agents/skills/](.agents/skills/) の手順書をスキルとして自動で発見する。
+  会話中に `$<スキル名>` の形で名前を指定して利用できる。名前と用途は
+  [AGENTS.md のスキル一覧](AGENTS.md#手順書スキル)を参照する
+- ビルド・検証には Claude Code と同じ `mise run build` / `mise run check` を使う。
+  リポジトリ外の Go・mise のキャッシュへのアクセスやネットワーク利用には、Codex 側の
+  実行承認が必要な場合がある（[Windows sandbox](https://learn.chatgpt.com/docs/windows/windows-sandbox)）
+- 実行許可・MCP 接続・プラグインは Codex 側で設定する。Codex 固有の注意は
+  [AGENTS.md の「エージェント別の補足 > Codex」](AGENTS.md#codex)を参照する
+
+Ponytail の追加コマンドを使う場合は、各自で次を実行する。ユーザー単位の設定であり、
+リポジトリには入れない（背景は [Ponytail の導入](docs/development/PONYTAIL.md)を参照）。
+
+```powershell
+codex plugin marketplace add DietrichGebert/ponytail
+codex plugin add ponytail@ponytail
+```
+
+初回は、会話で次のように指示書・スキルの認識と、実際のコマンド実行環境を確認する。
+
+```text
+AGENTS.md の規約と利用可能なプロジェクトのスキルを確認し、開発の進め方を説明してください。
+コマンド実行環境で $PSVersionTable.PSVersion を実行し、PowerShell 7 系であることも確認してください。
+```
+
+読み込み仕様は OpenAI 公式の
+[AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)・
+[スキル](https://learn.chatgpt.com/docs/build-skills)を参照する。
+
+#### Claude Code
+
+Claude Code は **2.1.277 以降が必須**で、それより前の版はサポートしない（`CLAUDE.md` が
+無いときに AGENTS.md を自動で読む機能を前提にしているため。`/config` の Project
+instructions は既定のまま）。Bedrock / Vertex / Foundry 経由では自動で読まれないので、
+個人の `CLAUDE.local.md`（Git 管理外）に `@AGENTS.md` の 1 行を書く。
 
 ### 4. プロジェクト固有の部分を埋める
 
