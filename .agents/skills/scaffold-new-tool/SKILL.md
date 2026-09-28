@@ -1,14 +1,89 @@
 ---
 name: scaffold-new-tool
-description: cmd/cli/ に Go CLI ツールを追加する依頼で使う。雛形・テスト・文書更新の手順を参照する。
+description: cmd/cli/ に Go CLI ツールを 1 本追加する依頼で使う。雛形コード・テスト・文書更新の手順。
 ---
 
-# Go CLI ツールの追加（Codex 用入口）
+# Go CLI ツールの追加
 
-[Codex 向け案内](../../../CODEX.md) の参照順と読み替えを適用し、
-[手順本体](../../../.agent/skills/scaffold_new_tool/SKILL.md) を実際に開いてから作業する。
-手順内の相対リンク・補助ファイルは手順本体の場所を基準に解決する。
+繰り返し使う CLI・解析ツールは Go で作る（Python を選ぶ条件は
+[AGENTS.md](../../../AGENTS.md) BASE RULES）。
+ソースコードの追加は合意ゲート（同「作業の進め方」）の対象なので、方針を共有してから着手する。
+1 ツール 1 ディレクトリ、`main` は薄く、ロジックは `internal/` に置いてテストする。
+実例は [cmd/cli/scaffold-init](../../../cmd/cli/scaffold-init/main.go) と
+[internal/scaffold](../../../internal/scaffold/rename.go)。
 
-繰り返し使う CLI・解析ツールは Go で作る（Python を選ぶ条件は AGENTS.md BASE RULES）。
-ソースコードの追加は合意ゲート（[AGENTS.md](../../../AGENTS.md)）の対象なので、方針を
-共有してから着手する。
+## 手順 1: ディレクトリ作成
+
+`cmd/cli/<tool-name>/`（小文字ケバブケース）を作る。
+
+```powershell
+New-Item -ItemType Directory -Force cmd/cli/<tool-name>
+```
+
+## 手順 2: main.go を雛形から作る
+
+設定はフラグと環境変数で受ける（`.env` は mise が読み込むので、dotenv ライブラリは
+不要）。ログは標準の `log/slog`。終了コードは 0 成功 / 1 処理失敗 / 2 引数不正。
+
+```go
+// <tool-name> は <一行説明>。
+//
+// 使い方:
+//
+//  go run ./cmd/cli/<tool-name> -input <path>
+package main
+
+import (
+    "flag"
+    "log/slog"
+    "os"
+)
+
+func main() {
+    var (
+        input = flag.String("input", "", "入力ファイル (必須)")
+    )
+    flag.Parse()
+
+    logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+    if *input == "" {
+        flag.Usage()
+        logger.Error("-input は必須です")
+        os.Exit(2)
+    }
+    if err := run(logger, *input); err != nil {
+        logger.Error("処理に失敗しました", "error", err)
+        os.Exit(1)
+    }
+}
+
+// run は本体処理。テストしやすいよう main から分離し、ロジックは internal/ に委譲する。
+func run(logger *slog.Logger, input string) error {
+    logger.Info("開始", "input", input)
+    return nil
+}
+```
+
+## 手順 3: ロジックとテストを internal/ に置く
+
+`internal/<pkg>/` にロジックを置き、`<pkg>_test.go` を
+[テスト設計指針](../../../docs/development/TESTING_STANDARDS.md) に従って書く
+（テスト対象情報の注釈・AAA 形式・`t.Logf` の日本語ログ）。
+
+## 手順 4: 文書を更新する
+
+- [CLI コマンド一覧](../../../docs/manuals/CLI_COMMANDS.md) に節を追加する
+- `internal/` を追加・変更したら
+  [内部ライブラリ索引](../../../docs/development/INTERNAL_LIBS.md) も更新する
+
+## 手順 5: 検証
+
+```powershell
+mise run check
+```
+
+## 注意
+
+- 一時出力は `temp/` だけ。デバッグ出力の拡張子は `.log`
+- 外部依存を足すときは `go get` の後に `go mod tidy` し、追加理由をコミットメッセージに書く
+- ビルド成果物（`*.exe`、`bin/`）はコミットしない（CI の tracked-ignored 検査で弾かれる）

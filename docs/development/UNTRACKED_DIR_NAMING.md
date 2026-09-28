@@ -42,7 +42,7 @@ CLI・スクリプト・手順書が既定値として参照するディレク�
 
 | ルート | 参照元 | 直下の規則 |
 |---|---|---|
-| `data/_extracted/` | [CLAUDE.md](../../CLAUDE.md)（受領 ZIP の展開物置き場） | `<受領日>_<受領名>/` |
+| `data/_extracted/` | [AGENTS.md](../../AGENTS.md)（受領 ZIP の展開物置き場） | `<受領日>_<受領名>/` |
 | 【要記入】 | | |
 
 ### 3.1 `temp/` 直下に直置きしてよいファイル（ツール I/O）
@@ -52,8 +52,8 @@ CLI・スクリプト・手順書が既定値として参照するディレク�
 
 | ファイル | 参照元 |
 |---|---|
-| `temp/commit_msg.txt` | [git_commit_push](../../.agent/skills/git_commit_push/SKILL.md) のコミットメッセージ受け渡し |
-| `temp/cmd_diagnosis_<timestamp>.log` | [diagnose_command_failure](../../.agent/skills/diagnose_command_failure/SKILL.md) の診断ログ |
+| `temp/commit_msg.txt` | [git-commit-push](../../.agents/skills/git-commit-push/SKILL.md) のコミットメッセージ受け渡し |
+| `temp/cmd_diagnosis_<timestamp>.log` | [diagnose-command-failure](../../.agents/skills/diagnose-command-failure/SKILL.md) の診断ログ |
 
 ## 4. 運用
 

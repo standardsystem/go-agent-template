@@ -62,7 +62,7 @@ fix bug                                 ← チケットも対象も不明
 
 - 日本語メッセージは `-m` で渡さず、`temp/` の UTF-8（BOM なし）ファイルから
   `git commit -F` で渡す（手順は
-  [git_commit_push](../../.agent/skills/git_commit_push/SKILL.md)）
+  [git-commit-push](../../.agents/skills/git-commit-push/SKILL.md)）
 - AI エージェントが作成したコミットには `Co-Authored-By:` トレーラを付け、履歴から
   関与を追えるようにする。値は各エージェントの規定値を使う
 

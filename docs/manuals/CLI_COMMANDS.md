@@ -1,7 +1,7 @@
 # CLI コマンド一覧
 
 `cmd/cli/<ツール名>/main.go` に 1 ツール 1 ディレクトリで置く。追加時は
-[scaffold_new_tool](../../.agent/skills/scaffold_new_tool/SKILL.md) の手順に従い、本書に
+[scaffold-new-tool](../../.agents/skills/scaffold-new-tool/SKILL.md) の手順に従い、本書に
 節を追加する。ビルドは `mise run build`（`bin/` に出力。Git 管理外）。
 
 ## scaffold-init

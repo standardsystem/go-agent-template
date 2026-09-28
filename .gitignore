@@ -62,6 +62,7 @@ node_modules/
 # ── AI エージェントのローカル設定 (共有設定は追跡、個人設定と MCP 認証情報は除外) ──
 .claude/settings.local.json
 .claude/*.local.*
+CLAUDE.local.md
 .mcp.json
 mcp_settings.json
 mcp-config.json
