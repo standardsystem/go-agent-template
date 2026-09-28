@@ -53,10 +53,15 @@ $cmd = "<ここに失敗したコマンド文字列>"
 
 保存先は `temp/`（Git 管理外。拡張子は `.log`）。
 
+スクリプトの出力は `Write-Host` なのでパイプラインに流れない（`Tee-Object` ではファイルが
+作られない）。`*>&1` で集めてから、LF にそろえて書く。
+
 ```powershell
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $logPath = "temp\cmd_diagnosis_${timestamp}.log"
-& ".\.agents\skills\diagnose-command-failure\scripts\collect_env.ps1" | Tee-Object -FilePath $logPath
+$log = & ".\.agents\skills\diagnose-command-failure\scripts\collect_env.ps1" *>&1 | Out-String
+$log
+Set-Content -Path $logPath -Value $log.ReplaceLineEndings("`n") -NoNewline -Encoding utf8NoBOM
 Write-Host "診断ログ保存先: $logPath"
 ```
 
@@ -82,8 +87,9 @@ Write-Host "診断ログ保存先: $logPath"
 **対策**:
 
 ```powershell
-# ファイル保存時に BOM なし UTF-8 を明示
-$content | Out-File -FilePath $path -Encoding utf8NoBOM
+# ファイル保存時に BOM なし UTF-8 と LF を明示（Out-File / Set-Content は Windows で CRLF を足す）
+$text = (($content -join "`n") + "`n").ReplaceLineEndings("`n")
+Set-Content -Path $path -Value $text -NoNewline -Encoding utf8NoBOM
 ```
 
 ### パターン B: 二重シェル (pwsh の上に powershell)

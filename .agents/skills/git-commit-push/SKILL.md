@@ -35,16 +35,18 @@ git diff --cached --stat
 
 エージェントのファイル書き込みツールで `temp/commit_msg.txt` を作るのが最も確実
 （UTF-8・BOM なし・LF）。PowerShell で作る場合は here-string を使い、終端の `'@` を
-行頭に置く。
+行頭に置く。`Set-Content` は Windows では末尾に CRLF を足すので、改行を LF にそろえて
+`-NoNewline` で書く（[AGENTS.md](../../../AGENTS.md) BASE RULES）。
 
 ```powershell
-@'
+$msg = @'
 feat: PROJ-123 ○○を追加
 
 変更の背景と要点を 2〜3 行で。
 
 Co-Authored-By: <エージェント規定の名前> <エージェント規定のアドレス>
-'@ | Set-Content -Path temp/commit_msg.txt -Encoding utf8NoBOM
+'@
+Set-Content -Path temp/commit_msg.txt -Value ($msg.ReplaceLineEndings("`n") + "`n") -NoNewline -Encoding utf8NoBOM
 ```
 
 `Co-Authored-By` の値は各エージェントの規定値を使う（Claude 用の値を他のエージェントが
