@@ -54,6 +54,28 @@ VS Code では「Developer: Reload Window」で再起動してから、新しい
   （mise で固定した Python を使う。`uv run` は不要）
 - 検査記録は git の最上位にある `.yomiyasu/` に保存される。原文と最終稿の全文が
   入るので `.gitignore` の対象にしている。個人情報を含む文書では `--no-record` を頼む
+- `--no-record` のとき（と記録先に書けないとき）は、記録の代わりに原文・資料・最終稿の
+  写しを `tempfile.gettempdir()` の下の `yomiyasu-check-<16進>/` に書き、終了時に消す。
+  既定では `%TEMP%` に書かれてしまうので、実行時は `TMPDIR`・`TEMP`・`TMP` をリポジトリの
+  `temp/` に向ける（[AGENTS.md](../../AGENTS.md) の「一時出力は ./temp のみ」）
+  - 3 つとも必要。Python は `TMPDIR` → `TEMP` → `TMP` の順に見て、Git Bash は `TMPDIR` を
+    設定している
+  - 絶対パスで、存在するフォルダを指す。存在しない先を指すと、Python は黙って
+    `C:\TEMP` やカレントディレクトリに切り替える
+  - Bash では `TMPDIR` を向けると、`run --stdin` のヒアドキュメントの一時ファイルも
+    `temp/` に入る
+
+  ```bash
+  T="$(git rev-parse --show-toplevel)/temp"
+  TMPDIR="$T" TEMP="$T" TMP="$T" python3 .agents/skills/yomiyasu/scripts/yomiyasu_check.py run --no-record ...
+  ```
+
+  ```powershell
+  # そのターミナルを閉じるまで効く
+  $t = "$(git rev-parse --show-toplevel)/temp"; $env:TMPDIR = $t; $env:TEMP = $t; $env:TMP = $t
+  python3 .agents/skills/yomiyasu/scripts/yomiyasu_check.py run --no-record ...
+  ```
+
 - フック（`scripts/yomiyasu_hook.py`）は登録しない。必要になったら、上流の
   `--print-config` が出す設定を確かめ、合意を取ってから個人設定に入れる
 

@@ -41,7 +41,11 @@ Codex の読み込み上限（既定 32 KiB）に収まる分量を保つこと�
   - Python 本体と `uv` のバージョンは [.mise.toml](.mise.toml) で固定する。
     `mise run info` で両方のバージョンを確認できる
   - 例外: 上流から同梱した [yomiyasu](.agents/skills/yomiyasu/SKILL.md) の
-    スクリプトは、上流の手順どおり `python3` で直接実行する（標準ライブラリだけで動く）
+    スクリプトは、上流の手順どおり `python3` で直接実行する（標準ライブラリだけで動く）。
+    `--no-record` でも原文と最終稿の写しを一時フォルダに書くので、実行時は
+    `TMPDIR`・`TEMP`・`TMP` の 3 つともリポジトリの `temp/` の絶対パスに向ける（Git Bash は
+    `TMPDIR` を設定しており、Python はそれを最優先で使う。コマンド例は
+    [YOMIYASU.md](docs/development/YOMIYASU.md)）
 - テンポラリのファイル出力が必要な場合は **`./temp` フォルダだけ**を使用すること。
   一時ディレクトリはここ 1 つで、`./tmp` や OS の一時ディレクトリは使わない
   - チケット対応・調査の作業ファイル、添付ダウンロードは

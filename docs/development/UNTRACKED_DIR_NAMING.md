@@ -54,6 +54,7 @@ CLI・スクリプト・手順書が既定値として参照するディレク�
 |---|---|
 | `temp/commit_msg.txt` | [git-commit-push](../../.agents/skills/git-commit-push/SKILL.md) のコミットメッセージ受け渡し |
 | `temp/cmd_diagnosis_<timestamp>.log` | [diagnose-command-failure](../../.agents/skills/diagnose-command-failure/SKILL.md) の診断ログ |
+| `temp/yomiyasu-check-<16進>/` | [yomiyasu](YOMIYASU.md) の検査中だけ作られる原稿の写し（終了時に自動で消える。異常終了で残ったら削除してよい） |
 
 ## 4. 運用
 
