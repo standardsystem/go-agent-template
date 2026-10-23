@@ -45,7 +45,7 @@ try {
 }
 
 # --- $OutputEncoding (PowerShell 変数) ---
-Write-Section "PowerShell \$OutputEncoding"
+Write-Section "PowerShell `$OutputEncoding"
 if ($null -ne $OutputEncoding) {
     Write-Host "名前      : $($OutputEncoding.EncodingName)"
     Write-Host "CodePage  : $($OutputEncoding.CodePage)"
@@ -58,11 +58,14 @@ if ($null -ne $OutputEncoding) {
 Write-Section "関連する環境変数"
 @("LANG", "LC_ALL", "LC_CTYPE", "PYTHONUTF8", "PYTHONIOENCODING") | ForEach-Object {
     $val = [System.Environment]::GetEnvironmentVariable($_)
-    Write-Host "${_,-20}: $(if ($val) { $val } else { '(未設定)' })"
+    Write-Host ("{0,-20}: {1}" -f $_, $(if ($val) { $val } else { '(未設定)' }))
 }
 
 # --- WSL 状態 ---
 Write-Section "WSL 状態"
+# wsl.exe は既定で UTF-16LE を出力して化けるため、この節だけ UTF-8 出力にする
+$prevWslUtf8 = $env:WSL_UTF8
+$env:WSL_UTF8 = '1'
 try {
     $wslStatus = & wsl --status 2>&1 | Out-String
     Write-Host $wslStatus
@@ -76,6 +79,7 @@ try {
 } catch {
     Write-Host "WSL リスト取得失敗: $_"
 }
+$env:WSL_UTF8 = $prevWslUtf8
 
 # --- 重要コマンドの場所 ---
 Write-Section "重要コマンドの実行ファイルパス"
@@ -83,9 +87,9 @@ Write-Section "重要コマンドの実行ファイルパス"
     $cmd = $_
     try {
         $path = (Get-Command $cmd -ErrorAction Stop).Source
-        Write-Host "${cmd,-10}: $path"
+        Write-Host ("{0,-10}: {1}" -f $cmd, $path)
     } catch {
-        Write-Host "${cmd,-10}: (見つかりません)"
+        Write-Host ("{0,-10}: {1}" -f $cmd, '(見つかりません)')
     }
 }
 
