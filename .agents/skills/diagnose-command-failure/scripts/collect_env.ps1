@@ -63,23 +63,37 @@ Write-Section "関連する環境変数"
 
 # --- WSL 状態 ---
 Write-Section "WSL 状態"
-# wsl.exe は既定で UTF-16LE を出力して化けるため、この節だけ UTF-8 出力にする
-$prevWslUtf8 = $env:WSL_UTF8
-$env:WSL_UTF8 = '1'
+# wsl.exe は既定で UTF-16LE を出力して化けるため、WSL_UTF8=1 で UTF-8 出力にする。
+# & で呼ぶと PowerShell はコンソールのコードページ（CP932 等）で読んで化けるので、
+# プロセスを直接起動して送る側・読む側とも UTF-8 にそろえる
+function Invoke-WslUtf8 {
+    param([string]$Arguments)
+    $psi = [System.Diagnostics.ProcessStartInfo]::new('wsl.exe', $Arguments)
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+    $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+    $psi.EnvironmentVariables['WSL_UTF8'] = '1'
+    $p = [System.Diagnostics.Process]::Start($psi)
+    $stderr = $p.StandardError.ReadToEndAsync()
+    $stdout = $p.StandardOutput.ReadToEnd()
+    $p.WaitForExit()
+    $stdout + $stderr.Result
+}
 try {
-    $wslStatus = & wsl --status 2>&1 | Out-String
+    $wslStatus = Invoke-WslUtf8 '--status'
     Write-Host $wslStatus
 } catch {
     Write-Host "WSL ステータス取得失敗: $_"
 }
 try {
-    $wslList = & wsl --list --verbose 2>&1 | Out-String
+    $wslList = Invoke-WslUtf8 '--list --verbose'
     Write-Host "WSL ディストリビューション:"
     Write-Host $wslList
 } catch {
     Write-Host "WSL リスト取得失敗: $_"
 }
-$env:WSL_UTF8 = $prevWslUtf8
 
 # --- 重要コマンドの場所 ---
 Write-Section "重要コマンドの実行ファイルパス"
