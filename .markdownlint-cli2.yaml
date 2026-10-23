@@ -15,3 +15,4 @@ ignores:
   - "data/**"
   - "bin/**"
   - ".venv/**"
+  - ".agents/skills/yomiyasu/**" # 上流から無改変で同梱 (docs/development/YOMIYASU.md)
