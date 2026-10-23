@@ -45,7 +45,7 @@ try {
 }
 
 # --- $OutputEncoding (PowerShell 変数) ---
-Write-Section "PowerShell \$OutputEncoding"
+Write-Section "PowerShell `$OutputEncoding"
 if ($null -ne $OutputEncoding) {
     Write-Host "名前      : $($OutputEncoding.EncodingName)"
     Write-Host "CodePage  : $($OutputEncoding.CodePage)"
@@ -58,19 +58,37 @@ if ($null -ne $OutputEncoding) {
 Write-Section "関連する環境変数"
 @("LANG", "LC_ALL", "LC_CTYPE", "PYTHONUTF8", "PYTHONIOENCODING") | ForEach-Object {
     $val = [System.Environment]::GetEnvironmentVariable($_)
-    Write-Host "${_,-20}: $(if ($val) { $val } else { '(未設定)' })"
+    Write-Host ("{0,-20}: {1}" -f $_, $(if ($val) { $val } else { '(未設定)' }))
 }
 
 # --- WSL 状態 ---
 Write-Section "WSL 状態"
+# wsl.exe は既定で UTF-16LE を出力して化けるため、WSL_UTF8=1 で UTF-8 出力にする。
+# & で呼ぶと PowerShell はコンソールのコードページ（CP932 等）で読んで化けるので、
+# プロセスを直接起動して送る側・読む側とも UTF-8 にそろえる
+function Invoke-WslUtf8 {
+    param([string]$Arguments)
+    $psi = [System.Diagnostics.ProcessStartInfo]::new('wsl.exe', $Arguments)
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+    $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+    $psi.EnvironmentVariables['WSL_UTF8'] = '1'
+    $p = [System.Diagnostics.Process]::Start($psi)
+    $stderr = $p.StandardError.ReadToEndAsync()
+    $stdout = $p.StandardOutput.ReadToEnd()
+    $p.WaitForExit()
+    $stdout + $stderr.Result
+}
 try {
-    $wslStatus = & wsl --status 2>&1 | Out-String
+    $wslStatus = Invoke-WslUtf8 '--status'
     Write-Host $wslStatus
 } catch {
     Write-Host "WSL ステータス取得失敗: $_"
 }
 try {
-    $wslList = & wsl --list --verbose 2>&1 | Out-String
+    $wslList = Invoke-WslUtf8 '--list --verbose'
     Write-Host "WSL ディストリビューション:"
     Write-Host $wslList
 } catch {
@@ -83,9 +101,9 @@ Write-Section "重要コマンドの実行ファイルパス"
     $cmd = $_
     try {
         $path = (Get-Command $cmd -ErrorAction Stop).Source
-        Write-Host "${cmd,-10}: $path"
+        Write-Host ("{0,-10}: {1}" -f $cmd, $path)
     } catch {
-        Write-Host "${cmd,-10}: (見つかりません)"
+        Write-Host ("{0,-10}: {1}" -f $cmd, '(見つかりません)')
     }
 }
 
