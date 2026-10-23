@@ -40,6 +40,12 @@ Codex の読み込み上限（既定 32 KiB）に収まる分量を保つこと�
     `venv` は使わない（環境がスクリプト単位で再現できるため）
   - Python 本体と `uv` のバージョンは [.mise.toml](.mise.toml) で固定する。
     `mise run info` で両方のバージョンを確認できる
+  - 例外: 上流から同梱した [yomiyasu](.agents/skills/yomiyasu/SKILL.md) の
+    スクリプトは、上流の手順どおり `python3` で直接実行する（標準ライブラリだけで動く）。
+    `--no-record` でも原文と最終稿の写しを一時フォルダに書くので、実行時は
+    `TMPDIR`・`TEMP`・`TMP` の 3 つともリポジトリの `temp/` の絶対パスに向ける（Git Bash は
+    `TMPDIR` を設定しており、Python はそれを最優先で使う。コマンド例は
+    [YOMIYASU.md](docs/development/YOMIYASU.md)）
 - テンポラリのファイル出力が必要な場合は **`./temp` フォルダだけ**を使用すること。
   一時ディレクトリはここ 1 つで、`./tmp` や OS の一時ディレクトリは使わない
   - チケット対応・調査の作業ファイル、添付ダウンロードは
@@ -211,10 +217,15 @@ Markdown を作成・編集するときは lint（`mise run lint:docs`。設定�
 | [git-commit-push](.agents/skills/git-commit-push/SKILL.md) | 依頼されたコミット・push |
 | [scaffold-new-tool](.agents/skills/scaffold-new-tool/SKILL.md) | `cmd/cli/` への Go CLI の追加 |
 | [diagnose-command-failure](.agents/skills/diagnose-command-failure/SKILL.md) | コマンドの先頭バイト欠落・文字化けの診断 |
+| [yomiyasu](.agents/skills/yomiyasu/SKILL.md) | 名前を出して日本語の推敲を頼まれたとき（上流から同梱） |
 
 - Codex はこの場所を自動で見つける（`$git-commit-push` のように名前でも指定できる）。
   Claude Code はスキルとして読み込まないので、該当するタスクでは上の表から本体を開いて
   従う
+- 例外として yomiyasu は、Claude Code も `.agents/` のローカルマーケットプレイスから
+  `/yomiyasu:yomiyasu` として読み込む（各メンバーの初回登録と更新手順は
+  [YOMIYASU.md](docs/development/YOMIYASU.md)）。上流から同梱したものなので、内容は
+  改変しない
 - 手順書を選んだこと自体は実行の許可ではない。コミット・push 等は合意ゲートに従う
 - 追加・改名・削除したら上の表も直す。`SKILL.md` のフロントマターには `name`
   （ディレクトリ名と同じハイフン区切りの名前）と `description`（使う場面）を書く

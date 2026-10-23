@@ -70,3 +70,5 @@ mcp-config.json
 .kiro/
 .gemini/
 .codex/
+# yomiyasu の検査記録 (原文と最終稿の全文を含む: docs/development/YOMIYASU.md)
+.yomiyasu/

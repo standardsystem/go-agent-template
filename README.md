@@ -20,6 +20,7 @@ CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理�
 | エージェント規約 | [AGENTS.md](AGENTS.md) | 唯一の指示書（Claude Code / Codex が直接読む）。合意ゲート、行動規範、エージェント別の補足 |
 | 実装の最小化 | [AGENTS.md](AGENTS.md)「実装の最小化規範（Ponytail）」/ [docs/development/PONYTAIL.md](docs/development/PONYTAIL.md) | Ponytail（YAGNI・既存コード・標準ライブラリ優先の梯子）の常時ルールと、規約との優先順位・更新手順 |
 | 手順書 | [.agents/skills/](.agents/skills/) | コミット、CLI 追加、コマンド失敗診断（Codex は自動で発見、Claude Code は AGENTS.md の表から参照） |
+| 日本語の推敲 | [.agents/skills/yomiyasu/](.agents/skills/yomiyasu/SKILL.md) / [docs/development/YOMIYASU.md](docs/development/YOMIYASU.md) | 上流の yomiyasu を同梱。Codex は自動で発見し、Claude Code はローカルマーケットプレイスのプラグインとして読む |
 | Claude Code 設定 | [.claude/settings.json](.claude/settings.json) / `.claude/agents/` | 共有の許可設定・Ponytail プラグインの共有有効化とサブエージェント定義の置き場 |
 | 開発規約 | [docs/development/](docs/development/) | コミット規約、テスト設計指針、Git 管理外ディレクトリ命名、内部ライブラリ索引 |
 | ナレッジ置き場 | [docs/knowledge/](docs/knowledge/index.md) | 索引 → 本体の階層でドメイン知識を蓄積 |
