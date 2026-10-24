@@ -5,8 +5,8 @@ Go 製 CLI / 解析ツール群を **AI エージェント（Claude Code / Codex
 CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理外ディレクトリの命名規約を
 最初から揃えた状態で新規プロジェクトを始められる。
 
-抜き出し元は社内の解析リポジトリ（n-df-load-chart）で、そこで数十コミットかけて固まった
-足場からプロジェクト固有の部分を除いたもの。
+社内の解析リポジトリ（n-df-load-chart）で数十コミットかけて固まった足場から、
+プロジェクト固有の部分を除いたもの。
 
 ## 何が入っているか
 
@@ -31,15 +31,15 @@ CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理�
 
 ### 1. 複製する
 
-GitHub のテンプレートリポジトリとして（リポジトリ設定で Template repository を有効に
-してある前提）:
+リポジトリ設定で Template repository を有効にしてある前提で、
+GitHub のテンプレートリポジトリとして複製する場合は、次を実行する。
 
 ```powershell
 gh repo create <org>/<repo> --template standardsystem/go-agent-template --private --clone
 Set-Location <repo>
 ```
 
-ローカルのコピーから始める場合:
+ローカルのコピーから始める場合は、次を実行する。
 
 ```powershell
 git clone https://github.com/standardsystem/go-agent-template <repo>
@@ -57,9 +57,9 @@ go run ./cmd/cli/scaffold-init -module github.com/<org>/<repo>            # 実�
 
 モジュールパスと `go-agent-template` という名前が、go.mod・import・設定・文書で一括
 置換される。置換後の scaffold-init は no-op になるので、不要なら `cmd/cli/scaffold-init`
-と `internal/scaffold` を削除してよい（削除したら
+と `internal/scaffold` を削除してよい。削除したら、
 [INTERNAL_LIBS.md](docs/development/INTERNAL_LIBS.md) と
-[CLI_COMMANDS.md](docs/manuals/CLI_COMMANDS.md) からも節を消す）。
+[CLI_COMMANDS.md](docs/manuals/CLI_COMMANDS.md) からも節を消す。
 
 ### 3. 環境を作って緑を確認する
 
@@ -105,7 +105,7 @@ codex plugin marketplace add DietrichGebert/ponytail
 codex plugin add ponytail@ponytail
 ```
 
-初回は、会話で次のように指示書・スキルの認識と、実際のコマンド実行環境を確認する。
+初回は会話で次のように指示書・スキルの認識と、実際のコマンド実行環境を確認する。
 
 ```text
 AGENTS.md の規約と利用可能なプロジェクトのスキルを確認し、開発の進め方を説明してください。
@@ -118,14 +118,14 @@ AGENTS.md の規約と利用可能なプロジェクトのスキルを確認し�
 
 #### Claude Code
 
-Claude Code は **2.1.277 以降が必須**で、それより前の版はサポートしない（`CLAUDE.md` が
-無いときに AGENTS.md を自動で読む機能を前提にしているため。`/config` の Project
-instructions は既定のまま）。Bedrock / Vertex / Foundry 経由では自動で読まれないので、
-個人の `CLAUDE.local.md`（Git 管理外）に `@AGENTS.md` の 1 行を書く。
+Claude Code は **2.1.277 以降が必須**で、それより前のバージョンはサポートしない
+（`CLAUDE.md` が無いときに AGENTS.md を自動で読む機能を前提にしているため）。
+`/config` の Project instructions は既定のままにする。Bedrock / Vertex / Foundry 経由では
+自動で読まれないので、個人の `CLAUDE.local.md`（Git 管理外）に `@AGENTS.md` の 1 行を書く。
 
 ### 4. プロジェクト固有の部分を埋める
 
-「【要記入】」を検索して埋める。主な箇所:
+「【要記入】」を検索して埋める。主な箇所は次のとおり。
 
 - [AGENTS.md](AGENTS.md): ドメインナレッジの必読資料、外部データソースの規約
 - [docs/development/COMMIT_CONVENTION.md](docs/development/COMMIT_CONVENTION.md):
@@ -173,13 +173,13 @@ data/ output/ temp/    Git 管理外。命名規約: docs/development/UNTRACKED_
 
 ## テンプレートの育て方
 
-- **昇格は 2 プロジェクト目から**: あるプロジェクトで入れた修正は、2 つ目のプロジェクトで
-  同じ修正が要ったときにだけテンプレートへ取り込む。1 件の事情を持ち込まない
-- **テンプレート自身の CI を緑に保つ**: 壊れたテンプレートは配布されるだけ害になる。
+- あるプロジェクトで入れた修正は、2 つ目のプロジェクトで同じ修正が要ったときにだけ
+  テンプレートへ取り込む。1 件の事情を持ち込まない
+- テンプレート自身の CI を緑に保つ。壊れたテンプレートは配布されるだけ害になる。
   [ci.yml](.github/workflows/ci.yml) はテンプレート自身にも回る
-- **バージョンは動作確認した値に固定する**: [.mise.toml](.mise.toml) の版を上げるときは
-  CI の緑を確認する
-- **派生プロジェクトとの差分確認**: テンプレート側の更新を取り込むときは、足場ファイルを
+- バージョンは動作確認した値に固定する。[.mise.toml](.mise.toml) のバージョンを上げる
+  ときは CI の緑を確認する
+- テンプレート側の更新を派生プロジェクトに取り込むときは、足場ファイルを
   `git diff --no-index` で見比べる
 
 ```powershell
@@ -190,4 +190,4 @@ git diff --no-index --stat C:\Projects\STANDARDSYSTEM\go-agent-template\.mise.to
 
 - `webapp-template`: Go API + React + Docker Compose の Web アプリ向け。本テンプレートは
   CLI / 解析ツール群とエージェント運用規約に寄せている。両方に共通する足場
-  （golangci-lint v2・markdownlint-cli2 の版）は揃えてある
+  （golangci-lint v2・markdownlint-cli2 のバージョン）は揃えてある
