@@ -1,12 +1,14 @@
 # Ponytail の導入（実装の最小化規範）
 
 [Ponytail](https://github.com/DietrichGebert/ponytail) は、AI エージェントに「怠け者の
-シニア開発者」の判断順序（YAGNI → 既存コード → 標準ライブラリ → プラットフォーム機能 →
+シニア開発者」の判断順序（YAGNI → 既存コード → 標準ライブラリ・プラットフォーム機能 →
 導入済み依存 → 1 行 → 最小実装）を常時適用させるプロンプト集。本書は、本テンプレートへ
 どの範囲で取り込んだか、なぜか、どう更新するかを記す。ルール本文は
 [AGENTS.md](../../AGENTS.md)「実装の最小化規範（Ponytail）」が正典で、ここには複製しない。
 
-取り込み元: 上流 v4.10.0（commit `e3ba2aa6`、2026-09-14）の `AGENTS.md`（簡約版ルール）。
+取り込み元: 上流 v5.3.3（commit `96608e07`、2026-10-29）の `AGENTS.md`（簡約版ルール）。
+初回の取り込みは v4.10.0（commit `e3ba2aa6`、2026-09-14）。下の「評価」は初回時点のもので、
+v5 系の変更点は「v5 系での変更（2026-11-04 取り込み）」に書く。
 
 ## 評価（2026-09-15 時点）
 
@@ -27,10 +29,10 @@ AGENTS.md の「本プロジェクトの規約との優先順位」で解決し�
 
 | 上流の記述 | 本テンプレートの規約 | 解決 |
 | --- | --- | --- |
-| 説明はコードの後に 3 行まで | 読んだ資料・前提・検証結果・未確認点を日本語で報告 | 報告は本テンプレートの規約が優先。上流も「明示的に求められた説明は省かない」としている |
+| 回答の末尾に、省いたこと・リスクを 1〜2 行（v4 系は「説明はコードの後に 3 行まで」） | 読んだ資料・前提・検証結果・未確認点を日本語で報告 | 報告は本テンプレートの規約が優先し、末尾の 1〜2 行はそれに加えて書く |
 | 不要と判断したら作らず 1 行で言う | 依頼範囲を勝手に縮小しない、変更は合意の上で | 依頼範囲を削る提案は着手前に出して合意を得る。依頼外の抽象・依存・雛形を省くのは自由 |
 | テストは最小の検証 1 つ。フレームワーク・フィクスチャ無し | AAA 形式・`t.Logf`・テスト対象情報 | 「1 つは残す」を下限とし、書き方は [TESTING_STANDARDS.md](TESTING_STANDARDS.md) |
-| `ponytail:` コメントで上限と引き上げ経路を残す | コメントは日本語 | 接頭辞 `ponytail:` は英語のまま（`/ponytail-debt` の grep 対象）、本文は日本語 |
+| `shortcut: <上限>, <引き上げる条件>` コメントを残す（v4 系は `ponytail:`） | コメントは日本語 | 接頭辞 `shortcut:` は英語のまま（`/ponytail-debt` の grep 対象。旧 `ponytail:` も拾う）、本文は日本語 |
 
 ### リスク
 
@@ -46,12 +48,27 @@ AGENTS.md の「本プロジェクトの規約との優先順位」で解決し�
   内容は同一なので害は無いが、`/ponytail off` で止まるのはプラグイン側だけで、AGENTS.md
   の規範はプロジェクト規約として残る
 
+### v5 系での変更（2026-11-04 取り込み）
+
+- 規範（上流 `AGENTS.md`）: 梯子が 7 段から 6 段になった（標準ライブラリとプラットフォーム
+  機能を 1 段に統合し、プロジェクト独自のものを優先）。「書く前に変更が届く場所をすべて
+  挙げる」「変更で壊れる呼び出し元・テストまで仕上げる」「移動するコードはエラー処理と
+  検証を保つ」「コメントは『なぜ』だけ」が加わり、手抜き箇所の接頭辞が `shortcut:` に
+  変わった。AGENTS.md の該当節を書き直し、既存の `ponytail:` コメントは書き換えない方針に
+  した
+- プラグイン（v5.3.3 の `hooks/`）: セッション開始時に `git ls-files` でコードベースの
+  地図を作る（`hooks/ponytail-map.js`、3 秒で打ち切り）。タスク台帳（`band`）の機能が
+  加わり、既定で各ターンの後に費用・トークン・タスク名などを
+  `~/.config/ponytail/band/<project>.csv` に書く。プロジェクトの解決に `git rev-parse` を
+  呼ぶ。外部への送信は、利用者が `webhookUrl`（https のみ）を設定したときだけで、既定は空。
+  タスク名は最初の依頼文になりうるので、webhook を設定するときは送る内容に注意する
+
 ## 採用範囲（2 層）
 
 | 層 | 何を | 対象 | 実体 |
 | --- | --- | --- | --- |
 | 1. 常時ルール | 上流 `AGENTS.md`（簡約版）を日本語化し、優先順位を付けたもの | 全エージェント（AGENTS.md を読む Claude Code / Codex / Gemini CLI / Cursor 等） | [AGENTS.md](../../AGENTS.md)「実装の最小化規範（Ponytail）」 |
-| 2. プラグイン | `/ponytail-review`（差分の過剰設計レビュー）、`/ponytail-audit`（リポジトリ全体）、`/ponytail-debt`（`ponytail:` コメントの台帳化）、強度切り替え `/ponytail lite\|full\|ultra\|off` | Claude Code | [.claude/settings.json](../../.claude/settings.json) の `extraKnownMarketplaces` / `enabledPlugins` ＋ 各メンバーの CLI 導入（下記） |
+| 2. プラグイン | `/ponytail-review`（差分の過剰設計レビュー）、`/ponytail-audit`（リポジトリ全体）、`/ponytail-debt`（`shortcut:` / 旧 `ponytail:` コメントの台帳化）、強度切り替え `/ponytail lite\|full\|ultra\|off` | Claude Code | [.claude/settings.json](../../.claude/settings.json) の `extraKnownMarketplaces` / `enabledPlugins` ＋ 各メンバーの CLI 導入（下記） |
 
 層 2 の `enabledPlugins` は「このプロジェクトで使うプラグイン」の宣言であり、GitHub 配布の
 プラグインはこれだけでは導入されない。Claude Code 2.1.270 では、ネットワーク上の
@@ -136,17 +153,17 @@ $j.projects.Keys | Where-Object { $_ -like '*go-agent-template*' } |
 - 通常の実装依頼では何もしなくてよい。層 1 が常に効く
 - 差分を「削れるところは無いか」の観点だけで見たいときは `/ponytail-review`。正しさ・
   セキュリティ・性能は対象外なので、通常のレビュー（`/code-review`）と併用する
-- 意図的に手を抜いた箇所の棚卸しは `/ponytail-debt`（`grep -rnE '(#|//) ?ponytail:'` と
-  同じ）
+- 意図的に手を抜いた箇所の棚卸しは `/ponytail-debt`（`git grep -nE '(#|//|/[*]) ?(shortcut|ponytail):'`
+  と同じ）
 
 ## 更新手順
 
 1. 前回取り込み以降の上流の変更を見る:
-   `https://github.com/DietrichGebert/ponytail/compare/e3ba2aa6...main`
+   `https://github.com/DietrichGebert/ponytail/compare/96608e07...main`
 2. 上流 `AGENTS.md` に変更があれば、AGENTS.md の該当節へ日本語で反映し、本書冒頭の版と
    commit を更新する
-3. プラグイン側（`hooks/*.js`）の差分も同時に読み、ネットワーク通信や外部プロセス起動が
-   増えていないか確認する。プラグインは上流 `plugin.json` の `version` が上がったときに
+3. プラグイン側（`hooks/` 配下）の差分も同時に読み、ネットワーク通信や外部プロセス起動、
+   書き込み先が増えていないか確認する。プラグインは上流 `plugin.json` の `version` が上がったときに
    配信される
 
 ## 無効化

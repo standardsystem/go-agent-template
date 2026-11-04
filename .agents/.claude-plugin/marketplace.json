@@ -7,7 +7,7 @@
       "name": "yomiyasu",
       "source": ".",
       "description": "AIが生成した日本語を、意味と条件を保って読みやすく整えるスキル",
-      "version": "2.2.0",
+      "version": "2.5.0",
       "license": "MIT",
       "homepage": "https://github.com/nanaism/yomiyasu",
       "skills": ["./skills/yomiyasu"]

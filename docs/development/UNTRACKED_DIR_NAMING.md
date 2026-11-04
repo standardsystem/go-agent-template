@@ -13,7 +13,7 @@
 ```
 
 | 要素 | 規則 |
-|---|---|
+| --- | --- |
 | `YYYYMMDD` | 先頭固定・8 桁・区切りなし。`data/` は**受領日**、`temp/` は**作業開始日**、`output/` は**作成（提出）日** |
 | チケット | 【要記入】チケットキーの小文字・区切りなし表記（例: Backlog `PROJ-123` → `proj123`）。ブランチ名 `fix/proj123-…` と同じ表記にする。複数チケットにまたがる場合は主チケット 1 つだけを書き、残りは内容語か `README.md` に逃がす |
 | 内容 | 日本語でよい（例: `API調査`）。`data/` は受領物の名称をそのまま。**個人名は入れない**（受領者・参加者名は役割語に置換） |
@@ -41,7 +41,7 @@ CLI・スクリプト・手順書が既定値として参照するディレク�
 更新すること。
 
 | ルート | 参照元 | 直下の規則 |
-|---|---|---|
+| --- | --- | --- |
 | `data/_extracted/` | [AGENTS.md](../../AGENTS.md)（受領 ZIP の展開物置き場） | `<受領日>_<受領名>/` |
 | 【要記入】 | | |
 
@@ -51,7 +51,7 @@ CLI・スクリプト・手順書が既定値として参照するディレク�
 サブフォルダへ移さない。追加時はこの表を更新すること。
 
 | ファイル | 参照元 |
-|---|---|
+| --- | --- |
 | `temp/commit_msg.txt` | [git-commit-push](../../.agents/skills/git-commit-push/SKILL.md) のコミットメッセージ受け渡し |
 | `temp/cmd_diagnosis_<timestamp>.log` | [diagnose-command-failure](../../.agents/skills/diagnose-command-failure/SKILL.md) の診断ログ |
 | `temp/yomiyasu-check-<16進>/` | [yomiyasu](YOMIYASU.md) の検査中だけ作られる原稿の写し（終了時に自動で消える。異常終了で残ったら削除してよい） |

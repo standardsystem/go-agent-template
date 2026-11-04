@@ -1,3 +1,3 @@
 module github.com/standardsystem/go-agent-template
 
-go 1.26
+go 1.27
