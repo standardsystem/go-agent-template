@@ -68,7 +68,7 @@ Write-Host "診断ログ保存先: $logPath"
 ## チェックリスト（調査時に確認する項目）
 
 | 項目 | 確認方法 | 備考 |
-|------|----------|------|
+| --- | --- | --- |
 | シェルのバージョン | `$PSVersionTable.PSVersion` | **`7.x` であること**。5.1 は文字化け・BOM の原因 |
 | 一時ファイルの BOM | `analyze_bytes.ps1` で先頭バイト確認 | EF BB BF = UTF-8 BOM |
 | PATH 環境変数 | `$env:PATH` | コマンドが見つかるか |

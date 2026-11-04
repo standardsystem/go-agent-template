@@ -1,15 +1,21 @@
 # toolchain (.mise.toml) の再現性 + ビルド / vet / lint / テストの緑を担保する CI。
 #
 # REQUIRED (失敗で PR ブロック):
-#   - mise run setup       : toolchain (Go / Node / Python / uv / golangci-lint / markdownlint-cli2) 再現性
+#   - mise run setup       : toolchain (Go / Node / Python / uv / golangci-lint / markdownlint-cli2 /
+#                            actionlint / govulncheck) 再現性
 #   - go build / go vet    : ビルド・標準静的解析
 #   - mise run lint:go     : golangci-lint (.golangci.yml)
+#   - mise run lint:actions: actionlint (.github/workflows/)
+#   - mise run vuln        : govulncheck (依存と Go 本体の既知の脆弱性)
 #   - tracked-ignored 検査 : .gitignore 該当の追跡ファイル (exe・成果物の誤コミット) 検知
 #   - 改行コード検査       : CRLF を含む追跡ファイルの検知 (改行は LF。.gitattributes)
 #   - mise run lint:docs   : markdownlint-cli2 (.markdownlint-cli2.yaml)
 #   - mise run test        : go test -race -cover
 #
 # テンプレート自身にもこの CI が回る。壊れたテンプレートを配布しないための自衛。
+#
+# アクションはタグではなくコミット SHA で固定する (タグは付け替えられるため)。版はコメントに
+# 書き、更新は .agents/skills/maintain-template/ の手順で行う。
 name: CI
 
 on:
@@ -30,11 +36,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup mise (Go / Node / Python / uv / gh / golangci-lint / markdownlint-cli2)
-        uses: jdx/mise-action@v4
+      - name: Setup mise (Go / Node / Python / uv / gh / golangci-lint / markdownlint-cli2 / actionlint / govulncheck)
+        uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
         with:
+          # mise 本体の版も手元で動作確認した値に固定する。省くとその時点の最新が入り、
+          # mise の不具合でツールが入らなくなることがある (n-df-load-chart で 2026-10 に発生)。
+          version: 2026.10.22
           experimental: true
           cache: true
 
@@ -51,6 +60,13 @@ jobs:
 
       - name: golangci-lint (REQUIRED)
         run: mise run lint:go
+
+      # ── REQUIRED: ワークフロー検査・脆弱性検査 ─────────────
+      - name: actionlint (REQUIRED)
+        run: mise run lint:actions
+
+      - name: govulncheck (REQUIRED)
+        run: mise run vuln
 
       # ── REQUIRED: .gitignore 該当の追跡ファイル検知 ─────────
       - name: tracked-ignored files check (REQUIRED)

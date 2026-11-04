@@ -12,15 +12,17 @@
 
 [tools]
 # ── ランタイム ──────────────────────────────────────────────
-go     = "1.26"      # go.mod の go ディレクティブと一致させる
-node   = "24"        # markdownlint-cli2 の実行基盤 (Active LTS)
-python = "3.13"      # 補助スクリプト用。仮想環境と依存は uv が管理する
+go     = "1.27"      # go.mod の go ディレクティブと一致させる
+node   = "26"        # markdownlint-cli2 の実行基盤 (Active LTS。2026-10-28 から)
+python = "3.14"      # 補助スクリプト用。仮想環境と依存は uv が管理する
 
 # ── 開発ツール ─────────────────────────────────────────────
-gh                      = "2.89.0"   # GitHub CLI
-uv                      = "0.12.13"  # Python の依存解決・実行 (pip / venv は直接使わない)
-golangci-lint           = "2.11.4"   # 設定は .golangci.yml (v2 形式)
-"npm:markdownlint-cli2" = "0.17.2"   # 設定は .markdownlint-cli2.yaml
+gh                      = "2.103.3"  # GitHub CLI
+uv                      = "0.13.6"   # Python の依存解決・実行 (pip / venv は直接使わない)
+golangci-lint           = "2.15.0"   # 設定は .golangci.yml (v2 形式)。Go を上げるときは対応版を確認
+"npm:markdownlint-cli2" = "0.24.0"   # 設定は .markdownlint-cli2.yaml
+actionlint              = "1.7.12"   # GitHub Actions のワークフロー検査
+"go:golang.org/x/vuln/cmd/govulncheck" = "v1.9.0" # Go の脆弱性検査 (標準ライブラリを含む)
 
 # ── 任意: Web フロントエンドを併用する場合に有効化 ──────────
 # pnpm   = "10"
@@ -64,8 +66,8 @@ description = "go vet"
 run = "go vet ./..."
 
 [tasks.lint]
-description = "静的解析 (Go + Markdown)"
-depends = ["lint:go", "lint:docs"]
+description = "静的解析 (Go + Markdown + GitHub Actions)"
+depends = ["lint:go", "lint:docs", "lint:actions"]
 
 [tasks."lint:go"]
 description = "golangci-lint (CI 必須ゲート。設定は .golangci.yml)"
@@ -75,6 +77,14 @@ run = "golangci-lint run ./..."
 description = "markdownlint-cli2 (CI 必須ゲート。設定は .markdownlint-cli2.yaml)"
 run = "markdownlint-cli2"
 
+[tasks."lint:actions"]
+description = "actionlint (CI 必須ゲート。.github/workflows/ を検査)"
+run = "actionlint"
+
+[tasks.vuln]
+description = "govulncheck (CI 必須ゲート。依存と Go 本体の既知の脆弱性を検査)"
+run = "govulncheck ./..."
+
 [tasks.fmt]
 description = "整形 (gofmt + markdownlint --fix)"
 run = [
@@ -83,8 +93,8 @@ run = [
 ]
 
 [tasks.check]
-description = "CI 相当 (vet + lint + test)"
-depends = ["vet", "lint", "test"]
+description = "CI 相当 (vet + lint + vuln + test)"
+depends = ["vet", "lint", "vuln", "test"]
 
 [tasks.info]
 description = "開発環境の情報表示"
@@ -97,6 +107,8 @@ run = [
   "gh --version",
   "golangci-lint --version",
   "markdownlint-cli2 --version",
+  "actionlint --version",
+  "govulncheck -version",
 ]
 
 [tasks."scaffold:init"]

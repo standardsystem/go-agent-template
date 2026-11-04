@@ -12,14 +12,14 @@ CI のハーネス、エージェント運用規約（AGENTS.md）、Git 管理�
 
 | 領域 | ファイル | 役割 |
 | --- | --- | --- |
-| ツールチェーン | [.mise.toml](.mise.toml) | Go / Node / gh / golangci-lint / markdownlint-cli2 の固定とタスク |
+| ツールチェーン | [.mise.toml](.mise.toml) | Go / Node / Python / uv / gh / golangci-lint / markdownlint-cli2 / actionlint / govulncheck の固定とタスク |
 | Go lint | [.golangci.yml](.golangci.yml) | golangci-lint v2。高シグナル linter を全件クリーン運用 |
 | Markdown lint | [.markdownlint-cli2.yaml](.markdownlint-cli2.yaml) | エージェントが書く文書の品質ゲート |
 | 改行・文字コード | [.gitattributes](.gitattributes) / [.editorconfig](.editorconfig) | LF に統一（cmd.exe の都合で `.cmd` / `.bat` だけ CRLF）。CRLF の混入は CI で検査 |
-| CI | [.github/workflows/ci.yml](.github/workflows/ci.yml) | mise で環境再現 → build / vet / lint / test / 誤コミット検査 |
+| CI | [.github/workflows/ci.yml](.github/workflows/ci.yml) | mise で環境再現 → build / vet / lint / 脆弱性検査 / test / 誤コミット検査。アクションは SHA で固定 |
 | エージェント規約 | [AGENTS.md](AGENTS.md) | 唯一の指示書（Claude Code / Codex が直接読む）。合意ゲート、行動規範、エージェント別の補足 |
 | 実装の最小化 | [AGENTS.md](AGENTS.md)「実装の最小化規範（Ponytail）」/ [docs/development/PONYTAIL.md](docs/development/PONYTAIL.md) | Ponytail（YAGNI・既存コード・標準ライブラリ優先の梯子）の常時ルールと、規約との優先順位・更新手順 |
-| 手順書 | [.agents/skills/](.agents/skills/) | コミット、CLI 追加、コマンド失敗診断（Codex は自動で発見、Claude Code は AGENTS.md の表から参照） |
+| 手順書 | [.agents/skills/](.agents/skills/) | コミット、CLI 追加、コマンド失敗診断、テンプレートの定期メンテ（Codex は自動で発見、Claude Code は AGENTS.md の表から参照） |
 | 日本語の推敲 | [.agents/skills/yomiyasu/](.agents/skills/yomiyasu/SKILL.md) / [docs/development/YOMIYASU.md](docs/development/YOMIYASU.md) | 上流の yomiyasu を同梱。Codex は自動で発見し、Claude Code はローカルマーケットプレイスのプラグインとして読む |
 | Claude Code 設定 | [.claude/settings.json](.claude/settings.json) / `.claude/agents/` | 共有の許可設定・Ponytail プラグインの共有有効化とサブエージェント定義の置き場 |
 | 開発規約 | [docs/development/](docs/development/) | コミット規約、テスト設計指針、Git 管理外ディレクトリ命名、内部ライブラリ索引 |
@@ -66,7 +66,7 @@ go run ./cmd/cli/scaffold-init -module github.com/<org>/<repo>            # 実�
 ```powershell
 mise trust
 mise run setup     # ツール導入 + go mod download
-mise run check     # vet + lint + test
+mise run check     # vet + lint + vuln + test
 ```
 
 **Claude Code と Codex のどちらでも、共通の規約・手順書・mise タスクで開発できる。**
@@ -150,9 +150,10 @@ Claude Code は **2.1.277 以降が必須**で、それより前のバージョ�
 | `mise run test` | `go test -race -cover ./...` |
 | `mise run test:short` | race 検出なし（cgo が使えない環境の代替） |
 | `mise run vet` | `go vet ./...` |
-| `mise run lint` | `lint:go`（golangci-lint）+ `lint:docs`（markdownlint-cli2） |
+| `mise run lint` | `lint:go`（golangci-lint）+ `lint:docs`（markdownlint-cli2）+ `lint:actions`（actionlint） |
+| `mise run vuln` | `govulncheck ./...`（依存と Go 本体の既知の脆弱性） |
 | `mise run fmt` | `gofmt` + `markdownlint-cli2 --fix` |
-| `mise run check` | CI 相当（vet + lint + test） |
+| `mise run check` | CI 相当（vet + lint + vuln + test） |
 | `mise run info` | ツールのバージョン表示 |
 | `mise run scaffold:init -- -module ...` | 名前の一括置換（`go run ./cmd/cli/scaffold-init` と同じ） |
 
@@ -179,6 +180,8 @@ data/ output/ temp/    Git 管理外。命名規約: docs/development/UNTRACKED_
   [ci.yml](.github/workflows/ci.yml) はテンプレート自身にも回る
 - バージョンは動作確認した値に固定する。[.mise.toml](.mise.toml) のバージョンを上げる
   ときは CI の緑を確認する
+- 社内プロジェクトの俯瞰・取り込み・版の更新は、定期メンテの手順書
+  [maintain-template](.agents/skills/maintain-template/SKILL.md) に沿って行う
 - テンプレート側の更新を派生プロジェクトに取り込むときは、足場ファイルを
   `git diff --no-index` で見比べる
 
@@ -190,4 +193,4 @@ git diff --no-index --stat C:\Projects\STANDARDSYSTEM\go-agent-template\.mise.to
 
 - `webapp-template`: Go API + React + Docker Compose の Web アプリ向け。本テンプレートは
   CLI / 解析ツール群とエージェント運用規約に寄せている。両方に共通する足場
-  （golangci-lint v2・markdownlint-cli2 のバージョン）は揃えてある
+  （golangci-lint v2・markdownlint-cli2 のバージョン）は、定期メンテのときに見比べる
